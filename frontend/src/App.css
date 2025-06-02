@@ -1,0 +1,942 @@
+/* frontend\src\App.css dosyası içeriği (Daha Şık Zamzar Benzeri Görünüm) */
+
+/* -- General Settings and Color Palette -- */
+:root {
+  --primary-color: #4b5563;
+  --primary-hover: #374151;
+  --success-color: #059669;
+  --success-hover: #047857;
+  --text-color-dark: #1f2937;
+  --text-color-medium: #4b5563;
+  --text-color-light: #6b7280;
+  --border-color: #e5e7eb;
+  --background-light: #f3f4f6;
+  --background-white: #ffffff;
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  
+  /* Gradient Colors */
+  --gradient-primary: linear-gradient(135deg, #4b5563 0%, #374151 100%);
+  --gradient-primary-hover: linear-gradient(135deg, #374151 0%, #1f2937 100%);
+  --gradient-success: linear-gradient(135deg, #059669 0%, #047857 100%);
+  --gradient-success-hover: linear-gradient(135deg, #047857 0%, #065f46 100%);
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    background-color: var(--zamzar-blue-light); /* Page background color */
+    background-image: linear-gradient(135deg, var(--zamzar-blue-light) 0%, var(--zamzar-blue-dark) 100%); /* Light gradient effect */
+    font-family: 'Arial', sans-serif; /* General font */
+    color: var(--text-color-dark); /* General text color */
+    min-height: 100vh; /* Ensure page is at least screen height */
+    display: flex; /* Use flex for centering content */
+    justify-content: center; /* Center horizontally */
+    align-items: center; /* Center vertically (if content is small) */
+    padding: 20px; /* Side margins */
+    box-sizing: border-box; /* Include padding and border in element size */
+}
+
+#root {
+  /* #root will now center the App component */
+  width: 100%; /* Use full width within body */
+  display: flex;
+  justify-content: center; /* Center App component horizontally */
+}
+
+.App {
+  background-color: var(--background-white); /* Main application box background */
+  padding: 30px; /* Inner padding */
+  border-radius: 8px; /* Corner roundness */
+  box-shadow: 0 4px 15px var(--shadow-light); /* More prominent shadow */
+  max-width: 850px; /* Maximum width of application box */
+  width: 100%; /* Use full width when below maximum */
+  text-align: center; /* Center text and inline/inline-block elements */
+}
+
+h1 {
+  color: var(--text-color-dark); /* Başlık rengi */
+  margin-bottom: 30px; /* Alt boşluk */
+  font-size: 2em; /* Başlık boyutu */
+}
+
+/* -- Tab Headers -- */
+.tabs {
+  display: flex; /* Arrange buttons side by side */
+  justify-content: center; /* Center buttons */
+  margin-bottom: 30px; /* Increase bottom margin */
+  border-bottom: 2px solid var(--border-color); /* Bottom line */
+}
+
+.tab-button {
+  padding: 10px 20px;
+  font-size: 1rem;
+  color: var(--text-color-medium);
+  background: var(--background-light);
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-weight: 500;
+}
+
+.tab-button:hover:not(.active) {
+  background: var(--border-color);
+  color: var(--text-color-dark);
+}
+
+.tab-button.active {
+  background: var(--gradient-primary);
+  color: white;
+}
+
+/* Box around tab contents */
+.tab-content {
+  /* border: 1px solid #eee; */ /* Removed this border, steps have their own borders */
+  padding: 0; /* Reset inner padding, steps will manage their own padding */
+  border-radius: 4px;
+  background-color: var(--background-white);
+}
+
+/* -- Step Indicator (1-2-3) -- */
+.conversion-steps {
+    display: flex;
+    justify-content: space-between; /* Distribute steps evenly */
+    align-items: center;
+    margin: 20px 0 40px 0; /* Increase bottom margin */
+    padding: 0 10px; /* Adjust side margins */
+    position: relative; /* For lines */
+}
+
+.conversion-steps .step {
+    display: flex;
+    flex-direction: column; /* Number and text stacked */
+    align-items: center;
+    flex-grow: 1; /* Share space equally */
+    text-align: center;
+    position: relative;
+    z-index: 1; /* Keep number and text above line */
+    color: var(--text-color-light); /* Default text color */
+    font-weight: bold;
+}
+
+.conversion-steps .step-number {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 35px; /* Increase size */
+    height: 35px; /* Increase size */
+    border-radius: 50%; /* Round shape */
+    background-color: #ccc; /* Default gray */
+    color: white;
+    font-weight: bold;
+    margin-bottom: 5px;
+    font-size: 1.1em;
+    box-shadow: 0 2px 5px var(--shadow-light); /* Light shadow */
+}
+
+.conversion-steps .step-text {
+    font-size: 0.9em;
+}
+
+/* Line between steps */
+.conversion-steps::before {
+    content: '';
+    position: absolute;
+    top: 27px; /* Align with center of numbers */
+    left: 30px; /* Start point */
+    right: 30px; /* End point */
+    height: 4px;
+    background-color: #eee; /* Gray line */
+    z-index: 0;
+}
+
+/* Completed (complete) and Active (active) step styles */
+.conversion-steps .step.active {
+     color: var(--zamzar-blue-dark); /* Active step text color */
+}
+
+.conversion-steps .step.active .step-number {
+     background-color: var(--zamzar-blue-dark); /* Active step number background */
+}
+
+.conversion-steps .step.complete {
+    color: var(--zamzar-green); /* Completed step text color */
+}
+
+.conversion-steps .step.complete .step-number {
+     background-color: var(--zamzar-green); /* Completed step number background */
+}
+
+/* Optional: Change line color up to completed step (requires more advanced CSS or JS, keeping it gray for now) */
+
+/* -- Main Conversion Form Area (3 Columns) -- */
+.conversion-form-row {
+    display: flex; /* Arrange items side by side */
+    flex-wrap: wrap; /* Stack on small screens */
+    gap: 20px; /* Space between columns */
+    align-items: stretch; /* Try to make columns equal height */
+    margin-bottom: 30px; /* Increase bottom margin */
+}
+
+/* Background color change during drag and drop */
+.conversion-form-row.dragging-over {
+     background-color: rgba(37, 99, 235, 0.05);
+     border: 2px dashed var(--primary-color);
+     border-radius: 8px;
+     padding: 10px; /* Add inner padding */
+}
+
+.step-col {
+    flex: 1; /* Tüm sütunlar eşit genişlikte olsun */
+    min-width: 220px; /* Çok daralmasınlar */
+    text-align: center; /* İçindeki metin ve inline öğeleri ortala */
+    display: flex; /* İçindeki content kutusunu flex ile yönetmek için */
+    flex-direction: column;
+}
+
+.step-col .step-content {
+     border: 1px solid var(--border-color);
+     border-radius: 8px; /* Yuvarlak köşeler */
+     padding: 20px 15px;
+     background-color: var(--background-white);
+     min-height: 160px; /* Yüksekliği artır */
+     display: flex;
+     flex-direction: column;
+     justify-content: center;
+     align-items: center;
+     flex-grow: 1; /* Kutunun adım sütununu doldurmasını sağla */
+}
+
+.step-col .step-icon {
+    font-size: 2.5em; /* İkon boyutu */
+    margin-bottom: 10px;
+    color: var(--text-color-medium);
+}
+
+.step-col .placeholder-text {
+    color: var(--text-color-light);
+    font-size: 0.9em;
+    margin: 0;
+}
+
+/* Adım 1: Dosya Seçme Alanı Stili (Dropzone Benzeri) */
+.step-col.choose-files .step-content {
+    border: 2px dashed var(--border-color);
+    background-color: var(--background-light);
+    transition: all 0.3s ease;
+    min-height: 200px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 16px;
+}
+
+.step-col.choose-files .step-content:hover {
+    border-color: var(--primary-color);
+    background-color: rgba(37, 99, 235, 0.05);
+}
+
+.step-col.choose-files .choose-files-button {
+    width: 80%;
+    max-width: 400px;
+    padding: 16px 24px;
+    font-size: 1.1rem;
+    background: var(--gradient-primary);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    box-shadow: var(--shadow);
+    position: relative;
+    overflow: hidden;
+}
+
+.step-col.choose-files .choose-files-button:hover {
+    background: var(--gradient-primary-hover);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+}
+
+.step-col.choose-files .choose-files-button:active {
+    transform: translateY(0);
+    box-shadow: var(--shadow);
+}
+
+.step-col.choose-files .choose-files-button svg {
+    width: 24px;
+    height: 24px;
+    transition: transform 0.3s ease;
+}
+
+.step-col.choose-files .choose-files-button:hover svg {
+    transform: translateY(-2px);
+}
+
+.step-col.choose-files .upload-icon {
+    color: var(--primary-color);
+    opacity: 0.8;
+    transition: all 0.3s ease;
+}
+
+.step-col.choose-files:hover .upload-icon {
+    opacity: 1;
+    transform: scale(1.1);
+}
+
+/* Seçilen Dosya Görünümü */
+.step-col.choose-files .selected-file-name {
+    font-size: 1rem;
+    color: var(--text-color-dark);
+    font-weight: 500;
+    text-align: center;
+    padding: 8px 16px;
+    background-color: var(--background-white);
+    border-radius: 8px;
+    box-shadow: var(--shadow-sm);
+    max-width: 80%;
+    word-break: break-all;
+}
+
+.step-col.choose-files .file-icon {
+    color: var(--success-color);
+}
+
+/* Sürükle-Bırak Durumu */
+.conversion-form-row.dragging-over .step-col.choose-files .step-content {
+    border-color: var(--primary-color);
+    background-color: rgba(37, 99, 235, 0.1);
+}
+
+.conversion-form-row.dragging-over .step-col.choose-files .upload-icon {
+    transform: scale(1.2);
+    color: var(--primary-hover);
+}
+
+/* Mobil Uyumluluk */
+@media (max-width: 768px) {
+    .step-col.choose-files .choose-files-button {
+        width: 90%;
+        padding: 12px 20px;
+        font-size: 1rem;
+    }
+
+    .step-col.choose-files .step-content {
+        min-height: 180px;
+    }
+}
+
+/* Adım 2: Format Seçme Alanı Stili */
+.step-col.convert-to .format-select,
+.step-col.convert-to .format-select-button {
+    padding: 10px 15px; /* Padding ayarla */
+    border: 1px solid var(--border-color);
+    border-radius: 5px;
+    font-size: 1em;
+    cursor: pointer;
+    background-color: var(--background-white);
+    width: 100%;
+    box-sizing: border-box;
+    color: var(--text-color-dark);
+    transition: border-color 0.3s ease;
+}
+
+.step-col.convert-to .format-select:hover:not(:disabled),
+.step-col.convert-to .format-select-button:hover:not(:disabled) {
+     border-color: var(--zamzar-blue-light);
+}
+
+.step-col.convert-to .format-select:disabled,
+.step-col.convert-to .format-select-button:disabled {
+    cursor: not-allowed;
+    background-color: var(--background-light);
+    color: var(--text-color-light);
+    border-color: #ccc;
+}
+
+/* OCR butonu özel stilleri */
+.step-col.convert-to .format-select-button {
+    background: var(--gradient-primary);
+    color: white;
+    border: none;
+    font-weight: bold;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+.step-col.convert-to .format-select-button:hover:not(:disabled) {
+    background: var(--gradient-primary-hover);
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.3);
+}
+.step-col.convert-to .format-select-button.selected {
+    background: var(--gradient-success);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+.step-col.convert-to .format-select-button.selected:hover:not(:disabled) {
+    background: var(--gradient-success-hover);
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.3);
+}
+
+/* Adım 3: Dönüştür Butonu Alanı Stili */
+.step-col.convert-now .convert-button {
+    background: var(--gradient-primary);
+    color: white;
+    border: none;
+    padding: 12px 25px; /* Padding artır */
+    border-radius: 5px;
+    font-size: 1.1em; /* Font boyutu */
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    width: 100%;
+    box-sizing: border-box;
+     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.step-col.convert-now .convert-button:hover:not(:disabled) {
+    background: var(--gradient-primary-hover);
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.3);
+}
+
+.step-col.convert-now .convert-button:disabled {
+     background-color: var(--background-light);
+     color: var(--text-color-light);
+     cursor: not-allowed;
+     box-shadow: none;
+}
+
+/* -- Sonuç Alanları -- */
+.conversion-results {
+    margin-top: 30px; /* Üst boşluğu artır */
+    padding: 15px;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    background-color: var(--background-white);
+    text-align: center;
+    min-height: 50px; /* En az bir yüksekliği olsun */
+    display: flex; /* İçeriği düzenlemek için flex */
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Loading Spinner */
+.loading-spinner {
+    width: 40px;
+    height: 40px;
+    border: 3px solid var(--background-light);
+    border-top: 3px solid var(--primary-color);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Durum Mesajları (Başarı/Hata) */
+.status-message {
+    padding: 16px;
+    border-radius: 8px;
+    font-weight: 500;
+    margin-bottom: 16px;
+}
+
+.status-message.success {
+    background-color: #ecfdf5;
+    color: var(--success-color);
+    border: 1px solid #a7f3d0;
+}
+
+.status-message.error {
+    background-color: #fef2f2;
+    color: #dc2626;
+    border: 1px solid #fecaca;
+}
+
+/* Metin çıktısı alanı */
+.conversion-results h3 {
+    font-size: 1.1em;
+    margin-bottom: 10px;
+    color: var(--text-color-dark);
+}
+/* Pre etiketi için stil (metin çıktısı) */
+.conversion-results pre {
+    white-space: pre-wrap; /* Satır sonlarını koru */
+    word-wrap: break-word; /* Uzun kelimeleri kır */
+    background-color: #eee;
+    padding: 10px;
+    border-radius: 4px;
+    max-height: 300px; /* Maksimum yükseklik */
+    overflow-y: auto; /* Dikey kaydırma çubuğu */
+    text-align: left; /* Metni sola hizala */
+    width: 100%; /* Genişliği ayarla */
+    box-sizing: border-box;
+}
+
+/* -- Mobil uyumluluk -- */
+@media (max-width: 768px) {
+    /* Form sütunları mobil görünümde alt alta */
+    .conversion-form-row {
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .step-col {
+        min-width: 100%; /* Tam genişlik yap */
+    }
+
+     /* Adım göstergesi mobil stil (alt alta ve sola hizalı) */
+    .conversion-steps {
+         flex-direction: column;
+         align-items: flex-start;
+         padding: 0;
+         margin-bottom: 20px; /* Alt boşluğu azalt */
+    }
+
+    .conversion-steps .step {
+         flex-direction: row; /* Numara ve metni yan yana */
+         align-items: center;
+         flex-grow: 0; /* Artık eşit genişlik paylaşmayacaklar */
+         margin-bottom: 10px;
+         text-align: left;
+    }
+
+    .conversion-steps .step-number {
+        margin-right: 10px;
+        margin-bottom: 0;
+    }
+
+    .conversion-steps::before {
+        /* Mobil görünümde dikey çizgi veya kaldırabilirsiniz */
+        content: none; /* Çizgiyi kaldır */
+    }
+
+     /* Genel App paddingi mobil cihazlarda azalt */
+     .App {
+        padding: 16px;
+        margin: 16px;
+     }
+
+     /* Başlık boyutu mobil cihazlarda küçült */
+     h1 {
+        font-size: 1.5em;
+     }
+
+     .choose-files-button,
+     .convert-button,
+     .format-select-button {
+        padding: 10px 20px;
+        font-size: 0.875rem;
+     }
+
+     .file-icon,
+     .upload-icon,
+     .format-icon,
+     .convert-icon {
+        width: 40px;
+        height: 40px;
+     }
+}
+
+/* İkon Stilleri */
+.file-icon,
+.upload-icon,
+.format-icon,
+.convert-icon {
+    width: 48px;
+    height: 48px;
+    margin-bottom: 16px;
+    color: var(--primary-color);
+    transition: transform 0.3s ease, color 0.3s ease;
+}
+
+.file-icon svg,
+.upload-icon svg,
+.format-icon svg,
+.convert-icon svg {
+    width: 100%;
+    height: 100%;
+}
+
+.upload-icon:hover,
+.format-icon:hover,
+.convert-icon:hover {
+    transform: scale(1.1);
+    color: var(--primary-hover);
+}
+
+/* Button Styles */
+.choose-files-button,
+.convert-button,
+.format-select-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 12px 24px;
+    font-size: 1rem;
+    font-weight: 600;
+    line-height: 1.5;
+    color: white;
+    background: var(--gradient-primary);
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: var(--shadow);
+    position: relative;
+    overflow: hidden;
+}
+
+.choose-files-button:hover,
+.convert-button:hover,
+.format-select-button:hover {
+    background: var(--gradient-primary-hover);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-lg);
+}
+
+.choose-files-button:active,
+.convert-button:active,
+.format-select-button:active {
+    transform: translateY(0);
+    box-shadow: var(--shadow);
+}
+
+.choose-files-button svg,
+.convert-button svg {
+    width: 20px;
+    height: 20px;
+}
+
+/* Format Seçici Stili */
+.format-select {
+    width: 100%;
+    padding: 12px 16px;
+    font-size: 1rem;
+    color: var(--text-color-dark);
+    background-color: var(--background-white);
+    border: 2px solid var(--border-color);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%236B7280'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    background-size: 20px;
+}
+
+.format-select:hover {
+    border-color: var(--primary-color);
+}
+
+.format-select:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+/* Loading Spinner */
+.loading-spinner {
+    width: 40px;
+    height: 40px;
+    border: 3px solid var(--background-light);
+    border-top: 3px solid var(--primary-color);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Durum Mesajları */
+.status-message {
+    padding: 16px;
+    border-radius: 8px;
+    font-weight: 500;
+    margin-bottom: 16px;
+}
+
+.status-message.success {
+    background-color: #ecfdf5;
+    color: var(--success-color);
+    border: 1px solid #a7f3d0;
+}
+
+.status-message.error {
+    background-color: #fef2f2;
+    color: #dc2626;
+    border: 1px solid #fecaca;
+}
+
+/* Mobil Uyumluluk */
+@media (max-width: 768px) {
+    .App {
+        padding: 16px;
+        margin: 16px;
+    }
+
+    .choose-files-button,
+    .convert-button,
+    .format-select-button {
+        padding: 10px 20px;
+        font-size: 0.875rem;
+    }
+
+    .file-icon,
+    .upload-icon,
+    .format-icon,
+    .convert-icon {
+        width: 40px;
+        height: 40px;
+    }
+}
+
+/* Diğer tüm CSS kurallarınız burada devam edecek */
+
+/* Dosya Önizleme Stilleri */
+.file-preview {
+    width: 120px;
+    height: 120px;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--background-white);
+    border-radius: 8px;
+    box-shadow: var(--shadow-sm);
+    overflow: hidden;
+}
+
+.preview-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.file-preview .file-icon {
+    width: 64px;
+    height: 64px;
+    color: var(--primary-color);
+}
+
+/* Dosya Kaldırma Butonu */
+.remove-file-button {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    font-size: 0.9rem;
+    color: var(--text-color-medium);
+    background-color: var(--background-light);
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-top: 12px;
+}
+
+.remove-file-button:hover {
+    background-color: #fee2e2;
+    color: #dc2626;
+}
+
+.remove-file-button svg {
+    width: 16px;
+    height: 16px;
+}
+
+/* Dönüştür Butonu Stilleri */
+.convert-button {
+    width: 100%;
+    max-width: 300px;
+    padding: 16px 24px;
+    font-size: 1.1rem;
+    background: var(--gradient-primary);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    box-shadow: var(--shadow);
+}
+
+.convert-button:hover:not(:disabled) {
+    background: var(--gradient-primary-hover);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+}
+
+.convert-button:active:not(:disabled) {
+    transform: translateY(0);
+    box-shadow: var(--shadow);
+}
+
+.convert-button:disabled {
+    background: var(--background-light);
+    color: var(--text-color-light);
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+.convert-button svg {
+    width: 24px;
+    height: 24px;
+    transition: transform 0.3s ease;
+}
+
+.convert-button:hover:not(:disabled) svg {
+    transform: rotate(180deg);
+}
+
+/* Buton İçi Spinner */
+.button-spinner {
+    width: 20px;
+    height: 20px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-top: 2px solid white;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+/* Seçilen Dosya Adı */
+.selected-file-name {
+    font-size: 1rem;
+    color: var(--text-color-dark);
+    font-weight: 500;
+    text-align: center;
+    padding: 8px 16px;
+    background-color: var(--background-white);
+    border-radius: 8px;
+    box-shadow: var(--shadow-sm);
+    max-width: 80%;
+    word-break: break-all;
+    margin: 8px 0;
+}
+
+/* Mobil Uyumluluk */
+@media (max-width: 768px) {
+    .file-preview {
+        width: 100px;
+        height: 100px;
+    }
+
+    .convert-button {
+        padding: 12px 20px;
+        font-size: 1rem;
+    }
+}
+
+/* Header Stilleri */
+.app-header {
+    background-color: var(--background-white);
+    box-shadow: var(--shadow);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    margin: -30px -30px 30px -30px;
+    padding: 20px 30px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.header-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.header-title {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 3rem;
+    line-height: 1;
+    transition: transform 0.3s ease;
+}
+
+.header-title:hover {
+    transform: scale(1.1);
+}
+
+/* Sekme Başlıkları */
+.tabs {
+    display: flex;
+    gap: 10px;
+    border-bottom: none;
+    margin: 0;
+    padding: 0;
+}
+
+.tab-button {
+    padding: 10px 20px;
+    font-size: 1rem;
+    color: var(--text-color-medium);
+    background: var(--background-light);
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-weight: 500;
+}
+
+.tab-button:hover:not(.active) {
+    background: var(--border-color);
+    color: var(--text-color-dark);
+}
+
+.tab-button.active {
+    background: var(--gradient-primary);
+    color: white;
+}
+
+/* Ana İçerik Alanı */
+.tab-content {
+    padding-top: 20px;
+}
+
+/* Mobil Uyumluluk */
+@media (max-width: 768px) {
+    .app-header {
+        margin: -16px -16px 20px -16px;
+        padding: 16px;
+    }
+
+    .header-content {
+        gap: 16px;
+    }
+
+    .app-header h1 {
+        font-size: 1.5rem;
+    }
+
+    .tabs {
+        flex-wrap: wrap;
+    }
+
+    .tab-button {
+        padding: 8px 16px;
+        font-size: 0.9rem;
+    }
+
+    .header-title {
+        font-size: 2.5rem;
+    }
+}
