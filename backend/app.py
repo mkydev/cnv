@@ -15,7 +15,6 @@ CORS(app)
 
 UPLOAD_FOLDER = os.path.join(os.path.dirname(__file__), '..', 'temp_files') 
 
-# Eğer yükleme klasörü yoksa oluştur
 if not os.path.exists(UPLOAD_FOLDER):
     os.makedirs(UPLOAD_FOLDER)
 
