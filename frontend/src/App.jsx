@@ -1,5 +1,5 @@
 import React, { useState, useRef, useMemo } from 'react';
-import './App.css';
+import './App.css'; // Make sure this path is correct
 
 const formatOptions = {
   image: {
@@ -26,49 +26,39 @@ const formatOptions = {
   ocr: {
     label: 'Extract Text (OCR)',
     inputAccept: 'image/*,.pdf',
-     output: [ // OCR for single format
+     output: [
         { value: 'txt', label: 'Text (OCR)' },
      ],
   },
   pdf: {
-    label: 'PDF Tools', // TAB NAME
-    inputAccept: '.pdf', // PDF Tools primarily take PDF files
-    subOperations: [ // Sub-operations for PDF
+    label: 'PDF Tools',
+    inputAccept: '.pdf',
+    subOperations: [
       { id: 'pdf-to-docx', label: 'Convert PDF to Word (DOCX)', targetFormat: 'docx' },
-      // Future PDF operations can be added here:
-      // { id: 'pdf-merge', label: 'Merge PDFs', targetFormat: 'pdf', multipleFiles: true },
-      // { id: 'pdf-split', label: 'Split PDF Pages', targetFormat: 'pdf' },
     ],
   },
 };
 
 function App() {
   const [activeTab, setActiveTab] = useState('image');
-  const [selectedFile, setSelectedFile] = useState(null);
+  const [selectedFiles, setSelectedFiles] = useState([]);
   const [targetFormat, setTargetFormat] = useState('');
   const [selectedPdfOperation, setSelectedPdfOperation] = useState('');
-  const [message, setMessage] = useState('');
-  const [downloadLink, setDownloadLink] = useState('');
+  const [conversionResults, setConversionResults] = useState({});
   const [isLoading, setIsLoading] = useState(false);
-  const [extractedText, setExtractedText] = useState('');
   const [isDragging, setIsDragging] = useState(false);
 
   const fileInputRef = useRef(null);
 
   const currentTabOptions = useMemo(() => formatOptions[activeTab], [activeTab]);
-
-  const currentInputAccept = useMemo(() => {
-    return currentTabOptions?.inputAccept || '*/*';
-  }, [currentTabOptions]);
+  const currentInputAccept = useMemo(() => currentTabOptions?.inputAccept || '*/*', [currentTabOptions]);
 
   const resetApplicationStates = () => {
-    setSelectedFile(null);
+    setSelectedFiles([]);
     setTargetFormat('');
     setSelectedPdfOperation('');
-    setMessage('');
-    setDownloadLink('');
+    setConversionResults({});
     setIsLoading(false);
-    setExtractedText('');
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
@@ -77,14 +67,13 @@ function App() {
   const handleTabChange = (tabName) => {
     setActiveTab(tabName);
     resetApplicationStates();
-    console.log("Tab changed to:", tabName);
   };
 
-  const handleChooseFilesClick = () => {
-    if (!selectedFile) { 
-        fileInputRef.current.click();
-    }
+  // This function will be called by buttons or the dropzone itself.
+  const triggerFileInput = () => {
+    fileInputRef.current.click();
   };
+
 
   const handleDragOver = (event) => {
     event.preventDefault();
@@ -95,122 +84,140 @@ function App() {
     setIsDragging(false);
   };
 
-  const commonFileSelectActions = (file) => {
-    setSelectedFile(file);
-    setTargetFormat('');
-    setSelectedPdfOperation('');
-    setMessage('');
-    setDownloadLink('');
-    setExtractedText('');
-    if (fileInputRef.current && !file) {
-        fileInputRef.current.value = '';
+  const commonFileSelectActions = (newlySelectedFileList) => {
+    const newFilesArray = Array.from(newlySelectedFileList);
+
+    setSelectedFiles(prevFiles => {
+      const existingFileNames = new Set(prevFiles.map(f => f.name));
+      const uniqueNewFiles = newFilesArray.filter(newFile => !existingFileNames.has(newFile.name));
+      return [...prevFiles, ...uniqueNewFiles];
+    });
+
+    setConversionResults({});
+
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
     }
   }
 
   const handleDrop = (event) => {
     event.preventDefault();
     setIsDragging(false);
-    const files = event.dataTransfer.files;
-    if (files.length > 0) {
-      const file = files[0];
-      commonFileSelectActions(file);
-      console.log("File dropped:", file.name);
-    }
+    commonFileSelectActions(event.dataTransfer.files);
   };
 
   const handleFileChange = (event) => {
-    const file = event.target.files[0];
-    if (file) {
-        commonFileSelectActions(file);
-        console.log("File selected:", file.name);
-    } else { 
-        commonFileSelectActions(null);
-    }
+    commonFileSelectActions(event.target.files);
   };
-  
-  const handleRemoveFile = (e) => {
-    e.stopPropagation(); 
-    commonFileSelectActions(null);
+
+  const handleRemoveFile = (fileNameToRemove) => {
+    setSelectedFiles(prevFiles => prevFiles.filter(file => file.name !== fileNameToRemove));
+    setConversionResults(prevResults => {
+      const newResults = {...prevResults};
+      delete newResults[fileNameToRemove];
+      if (Object.keys(newResults).length === 1 && newResults.global) {
+        delete newResults.global;
+      }
+      return newResults;
+    });
+  };
+
+  const handleClearAllFiles = () => {
+    setSelectedFiles([]);
+    setConversionResults({});
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
   };
 
   const handleFormatDropdownChange = (event) => {
     const format = event.target.value;
     setTargetFormat(format);
-    setSelectedPdfOperation(''); 
-    setMessage('');
-    setDownloadLink('');
-    setExtractedText('');
-    console.log("Target format (select) chosen:", format);
+    setSelectedPdfOperation('');
+    setConversionResults({});
   };
 
   const handlePdfOperationSelect = (operationId) => {
     const operation = formatOptions.pdf.subOperations.find(op => op.id === operationId);
     if (operation) {
       setSelectedPdfOperation(operationId);
-      setTargetFormat(operation.targetFormat); 
-      setMessage('');
-      setDownloadLink('');
-      setExtractedText('');
-      console.log("PDF Operation selected:", operation.label, "Target format:", operation.targetFormat);
+      setTargetFormat(operation.targetFormat);
+      setConversionResults({});
     }
   };
 
   const handleOcrSelect = () => {
-    setTargetFormat('txt'); 
-    setSelectedPdfOperation(''); 
-    setMessage('');
-    setDownloadLink('');
-    setExtractedText('');
-    console.log("OCR (Text) format selected.");
+    setTargetFormat('txt');
+    setSelectedPdfOperation('');
+    setConversionResults({});
   };
 
   const handleConvert = async () => {
-    if (!selectedFile) {
-      setMessage('Please select a file.');
+    if (selectedFiles.length === 0) {
+      setConversionResults({ global: { message: 'Please select at least one file.', type: 'error' } });
       return;
     }
-    if (!targetFormat) { 
-      setMessage('Please select a target format or operation.');
+    if (!targetFormat) {
+      setConversionResults({ global: { message: 'Please select a target format or operation.', type: 'error' } });
       return;
     }
 
     setIsLoading(true);
-    setMessage('Converting, please wait...');
-    setDownloadLink('');
-    setExtractedText('');
+    setConversionResults({ global: { message: `Processing ${selectedFiles.length} file(s)...`, type: 'info' } });
 
-    const formData = new FormData();
-    formData.append('file', selectedFile);
-    formData.append('target_format', targetFormat);
+    let currentBatchResults = {};
 
-    try {
-      const response = await fetch('http://localhost:5001/convert', {
-        method: 'POST',
-        body: formData,
-      });
-      const data = await response.json();
+    for (const file of selectedFiles) {
+      currentBatchResults[file.name] = { message: `Converting ${file.name}...`, type: 'info', link: null, text_content: null };
+      setConversionResults(prev => ({...prev, ...currentBatchResults}));
 
-      if (response.ok && data.success) {
-        setMessage('Operation successful!');
-        if (targetFormat === 'txt' && data.text_content !== undefined) {
-          setExtractedText(data.text_content);
-        } else if (data.output_filename) {
-          setDownloadLink(`http://localhost:5001/download/${data.output_filename}`);
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('target_format', targetFormat);
+
+      try {
+        const response = await fetch('http://localhost:5001/convert', {
+          method: 'POST',
+          body: formData,
+        });
+        const data = await response.json();
+
+        if (response.ok && data.success) {
+          currentBatchResults[file.name] = {
+            message: `${file.name} converted successfully!`,
+            type: 'success',
+            link: data.output_filename ? `http://localhost:5001/download/${data.output_filename}` : null,
+            text_content: data.text_content || null
+          };
         } else {
-          setMessage('Operation seems successful but no output information was received.');
+          currentBatchResults[file.name] = {
+            message: `Error converting ${file.name}: ${data.error || response.statusText || 'Unknown server error.'}`,
+            type: 'error',
+            link: null,
+            text_content: null
+          };
         }
-      } else {
-        setMessage(`Error: ${data.error || response.statusText || 'An unknown server error occurred.'}`);
+      } catch (error) {
+        currentBatchResults[file.name] = {
+          message: `Error converting ${file.name}: ${error.message}`,
+          type: 'error',
+          link: null,
+          text_content: null
+        };
       }
-    } catch (error) {
-      setMessage(`An error occurred: ${error.message}`);
-    } finally {
-      setIsLoading(false);
+      setConversionResults(prev => ({...prev, ...currentBatchResults}));
     }
+
+    currentBatchResults.global = { message: 'All files processed.', type: 'info'};
+    setConversionResults(prev => ({...prev, ...currentBatchResults}));
+    setIsLoading(false);
   };
 
-  const currentStep = !selectedFile ? 1 : (!targetFormat) ? 2 : 3;
-  const isStep3Complete = !isLoading && (downloadLink || extractedText);
+  const currentStep = selectedFiles.length === 0 ? 1 : (!targetFormat) ? 2 : 3;
+  const isStep3Complete = !isLoading &&
+                         Object.keys(conversionResults).length > (conversionResults.global ? 1:0) &&
+                         !Object.values(conversionResults).some(r => r.type === 'info' && r.message.startsWith('Converting'));
+
 
   return (
     <div className="App">
@@ -235,7 +242,7 @@ function App() {
         <div className="conversion-steps">
           <div className={`step ${currentStep > 1 || isStep3Complete ? 'complete' : currentStep === 1 ? 'active' : ''}`}>
             <span className="step-number">1</span>
-            <span className="step-text">Select File</span>
+            <span className="step-text">Select File(s)</span>
           </div>
           <div className={`step ${currentStep > 2 || isStep3Complete ? 'complete' : currentStep === 2 ? 'active' : ''}`}>
             <span className="step-number">2</span>
@@ -259,55 +266,79 @@ function App() {
             onChange={handleFileChange}
             style={{ display: 'none' }}
             accept={currentInputAccept}
+            multiple
           />
           <div
             className="step-col choose-files"
-            onClick={handleChooseFilesClick} 
+            // The main dropzone area itself can trigger file input if no files are selected
+            // Otherwise, users should use the "Add More Files" button for clarity.
+            onClick={() => { if (selectedFiles.length === 0) triggerFileInput();}}
           >
-            <div className="step-content">
-              {selectedFile ? (
-                <>
-                  <div className="file-preview">
-                    {selectedFile.type.startsWith('image/') ? (
-                      <img src={URL.createObjectURL(selectedFile)} alt="Preview" className="preview-image" />
-                    ) : (
-                      <div className="file-icon">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
-                      </div>
-                    )}
+            <div className={`step-content ${selectedFiles.length > 0 ? 'has-files' : ''}`}>
+              {selectedFiles.length > 0 ? (
+                <div className="selected-files-wrapper">
+                  <div className="selected-files-container">
+                    <p>{selectedFiles.length} file(s) selected:</p>
+                    <ul className="selected-files-list">
+                      {selectedFiles.map(file => (
+                        <li key={file.name}>
+                          <span className="file-list-name">{file.name}</span>
+                          <span className="file-list-size">({ (file.size / 1024).toFixed(2) } KB)</span>
+                          <button
+                            onClick={(e) => { e.stopPropagation(); handleRemoveFile(file.name);}}
+                            className="remove-individual-file-button"
+                            title="Remove this file"
+                          >
+                            &times;
+                          </button>
+                        </li>
+                      ))}
+                    </ul>
                   </div>
-                  <p className="selected-file-name">{selectedFile.name}</p>
-                  <button className="remove-file-button" onClick={handleRemoveFile}>
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-                    Remove File
-                  </button>
-                </>
+                  <div className="file-actions-buttons">
+                    <button
+                      className="action-button add-more-button" // Using a more generic "action-button" base class
+                      onClick={(e) => { e.stopPropagation(); triggerFileInput(); }}
+                    >
+                      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="16"></line><line x1="8" y1="12" x2="16" y2="12"></line></svg>
+                      Add More Files
+                    </button>
+                    <button
+                      className="action-button clear-all-button"
+                      onClick={(e) => { e.stopPropagation(); handleClearAllFiles();}}
+                    >
+                      <svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
+                      Clear All Files
+                    </button>
+                  </div>
+                </div>
               ) : (
                 <>
-                  <div className="upload-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg></div>
-                  <button className="choose-files-button">
-                    <span>Choose File or Drag & Drop</span>
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+                  <div className="upload-icon"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg></div>
+                  <button className="choose-files-button-main" onClick={(e) => { e.stopPropagation(); triggerFileInput();}}>
+                    <span>Choose File(s) or Drag & Drop</span>
+                    <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
                   </button>
                 </>
               )}
             </div>
           </div>
 
+          {/* Step 2 and Step 3 remain the same */}
           <div className="step-col convert-to">
             <div className="step-content">
               <div className="format-icon">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
               </div>
-              {!selectedFile ? (
-                <p className="placeholder-text">Select a file first</p>
+              {selectedFiles.length === 0 ? (
+                <p className="placeholder-text">Select file(s) first</p>
               ) : (
                 <>
                   {activeTab === 'ocr' && (
                     <button
                       className={`format-select-button ${targetFormat === 'txt' ? 'selected' : ''}`}
                       onClick={handleOcrSelect}
-                      disabled={isLoading || !selectedFile} 
+                      disabled={isLoading || selectedFiles.length === 0}
                     >
                       {formatOptions.ocr.output[0].label}
                     </button>
@@ -320,7 +351,7 @@ function App() {
                           key={op.id}
                           className={`format-select-button ${selectedPdfOperation === op.id ? 'selected' : ''}`}
                           onClick={() => handlePdfOperationSelect(op.id)}
-                          disabled={isLoading || !selectedFile} 
+                          disabled={isLoading || selectedFiles.length === 0}
                         >
                           {op.label}
                         </button>
@@ -333,7 +364,7 @@ function App() {
                       id="targetFormat"
                       value={targetFormat}
                       onChange={handleFormatDropdownChange}
-                      disabled={isLoading || !selectedFile} 
+                      disabled={isLoading || selectedFiles.length === 0}
                       className="format-select"
                     >
                       {(formatOptions[activeTab]?.output || []).map(option => (
@@ -349,14 +380,14 @@ function App() {
           <div className="step-col convert-now">
             <div className="step-content">
               <div className="convert-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg></div>
-              {!selectedFile && (<p className="placeholder-text">Ready to convert</p>)}
-              {selectedFile && !targetFormat && (<p className="placeholder-text">Select an operation</p>)}
-              {selectedFile && targetFormat && (
-                <button onClick={handleConvert} disabled={isLoading || !selectedFile || !targetFormat} className="convert-button">
+              {selectedFiles.length === 0 && (<p className="placeholder-text">Ready to convert</p>)}
+              {selectedFiles.length > 0 && !targetFormat && (<p className="placeholder-text">Select an operation</p>)}
+              {selectedFiles.length > 0 && targetFormat && (
+                <button onClick={handleConvert} disabled={isLoading || selectedFiles.length === 0 || !targetFormat} className="convert-button">
                   {isLoading ? (
-                    <><div className="button-spinner"></div><span>Converting...</span></>
+                    <><div className="button-spinner"></div><span>Processing...</span></>
                   ) : (
-                    <><span>Convert</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 12a9 9 0 0 1-9 9m9-9a9 9 0 0 0-9-9m9 9H3m9 9a9 9 0 0 1-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9"></path></svg></>
+                    <><span>Convert File(s)</span><svg viewBox="0 0 24 24"><path d="M21 12a9 9 0 0 1-9 9m9-9a9 9 0 0 0-9-9m9 9H3m9 9a9 9 0 0 1-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9"></path></svg></>
                   )}
                 </button>
               )}
@@ -365,19 +396,45 @@ function App() {
         </div>
 
         <div className="conversion-results">
-          {isLoading && (<div className="loading-spinner"></div>)}
-          {!isLoading && message && (
-            <p className={`status-message ${message.toLowerCase().startsWith('error') ? 'error' : 'success'}`}>{message}</p>
+          {isLoading &&
+           Object.values(conversionResults).filter(r => r.type === 'info' && r.message.startsWith('Converting')).length === 0 &&
+           !conversionResults.global?.message.startsWith('All files') &&
+           (<div className="loading-spinner"></div>)
+          }
+
+          {conversionResults.global && (
+            <p className={`status-message global-status-${conversionResults.global.type}`}>
+              {conversionResults.global.message}
+            </p>
           )}
-          {!isLoading && downloadLink && (
-            <p>Download converted file <a href={downloadLink} target="_blank" rel="noopener noreferrer" download>here</a>.</p>
-          )}
-          {!isLoading && extractedText && (
-            <div style={{ marginTop: '15px', textAlign: 'left', width: '100%' }}>
-              <h3>Extracted Text:</h3>
-              <pre>{extractedText}</pre>
-            </div>
-          )}
+
+          {Object.entries(conversionResults).map(([fileName, result]) => {
+            if (fileName === 'global') return null;
+            return (
+              <div key={fileName} className={`file-result-entry result-type-${result.type}`}>
+                <div className="file-result-header">
+                  <span className="file-result-name">{fileName}</span>
+                  <span className={`file-result-status-badge status-${result.type}`}>
+                    {result.type.charAt(0).toUpperCase() + result.type.slice(1)}
+                  </span>
+                </div>
+                <p className="file-result-message">{result.message.replace(`${fileName} converted successfully!`, 'Conversion successful!').replace(`Error converting ${fileName}:`, 'Error:')}</p>
+                {result.link && (
+                  <p className="download-section">
+                    <a href={result.link} target="_blank" rel="noopener noreferrer" download className="download-link-button">
+                      Download Output
+                    </a>
+                  </p>
+                )}
+                {result.text_content && (
+                  <div className="extracted-text-container">
+                    <h4>Extracted Text:</h4>
+                    <pre>{result.text_content}</pre>
+                  </div>
+                )}
+              </div>
+            );
+          })}
         </div>
       </div>
     </div>
