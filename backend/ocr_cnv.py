@@ -1,4 +1,3 @@
-# ocr_cnv.py
 import pytesseract
 from PIL import Image
 import os
