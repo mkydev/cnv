@@ -4,8 +4,8 @@ import os
 import uuid
 import json
 import logging
-import shutil # Teşhis için eklendi
-import subprocess # Teşhis için eklendi
+import shutil 
+import subprocess 
 
 # Diğer Python dosyalarından ilgili fonksiyonları import ediyoruz
 from config import UPLOAD_FOLDER
