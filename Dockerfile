@@ -1,7 +1,7 @@
 # Python'un slim versiyonunu temel alıyoruz
 FROM python:3.10-slim
 
-# Tesseract, Poppler ve Curl'e ek olarak ImageMagick'i de kuruyoruz.
+# Tesseract, Poppler, Curl ve ImageMagick'i kuruyoruz.
 RUN apt-get update && apt-get install -y \
     tesseract-ocr \
     poppler-utils \
