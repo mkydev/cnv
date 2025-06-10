@@ -1,5 +1,5 @@
 import React, { useState, useRef, useMemo } from 'react';
-import './App.css'; // Make sure this path is correct
+import './App.css'; 
 
 const formatOptions = {
   image: {
@@ -69,11 +69,9 @@ function App() {
     resetApplicationStates();
   };
 
-  // This function will be called by buttons or the dropzone itself.
   const triggerFileInput = () => {
     fileInputRef.current.click();
   };
-
 
   const handleDragOver = (event) => {
     event.preventDefault();
@@ -176,7 +174,7 @@ function App() {
       formData.append('target_format', targetFormat);
 
       try {
-        const response = await fetch('http://localhost:5001/convert', {
+        const response = await fetch('/convert', {
           method: 'POST',
           body: formData,
         });
@@ -186,7 +184,7 @@ function App() {
           currentBatchResults[file.name] = {
             message: `${file.name} converted successfully!`,
             type: 'success',
-            link: data.output_filename ? `http://localhost:5001/download/${data.output_filename}` : null,
+            link: data.output_filename ? `/download/${data.output_filename}` : null,
             text_content: data.text_content || null
           };
         } else {
@@ -212,12 +210,11 @@ function App() {
     setConversionResults(prev => ({...prev, ...currentBatchResults}));
     setIsLoading(false);
   };
-
+  
   const currentStep = selectedFiles.length === 0 ? 1 : (!targetFormat) ? 2 : 3;
   const isStep3Complete = !isLoading &&
-                         Object.keys(conversionResults).length > (conversionResults.global ? 1:0) &&
-                         !Object.values(conversionResults).some(r => r.type === 'info' && r.message.startsWith('Converting'));
-
+                          Object.keys(conversionResults).length > (conversionResults.global ? 1:0) &&
+                          !Object.values(conversionResults).some(r => r.type === 'info' && r.message.startsWith('Converting'));
 
   return (
     <div className="App">
@@ -270,8 +267,6 @@ function App() {
           />
           <div
             className="step-col choose-files"
-            // The main dropzone area itself can trigger file input if no files are selected
-            // Otherwise, users should use the "Add More Files" button for clarity.
             onClick={() => { if (selectedFiles.length === 0) triggerFileInput();}}
           >
             <div className={`step-content ${selectedFiles.length > 0 ? 'has-files' : ''}`}>
@@ -297,7 +292,7 @@ function App() {
                   </div>
                   <div className="file-actions-buttons">
                     <button
-                      className="action-button add-more-button" // Using a more generic "action-button" base class
+                      className="action-button add-more-button"
                       onClick={(e) => { e.stopPropagation(); triggerFileInput(); }}
                     >
                       <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="16"></line><line x1="8" y1="12" x2="16" y2="12"></line></svg>
@@ -324,7 +319,6 @@ function App() {
             </div>
           </div>
 
-          {/* Step 2 and Step 3 remain the same */}
           <div className="step-col convert-to">
             <div className="step-content">
               <div className="format-icon">
@@ -397,9 +391,9 @@ function App() {
 
         <div className="conversion-results">
           {isLoading &&
-           Object.values(conversionResults).filter(r => r.type === 'info' && r.message.startsWith('Converting')).length === 0 &&
-           !conversionResults.global?.message.startsWith('All files') &&
-           (<div className="loading-spinner"></div>)
+            Object.values(conversionResults).filter(r => r.type === 'info' && r.message.startsWith('Converting')).length === 0 &&
+            !conversionResults.global?.message.startsWith('All files') &&
+            (<div className="loading-spinner"></div>)
           }
 
           {conversionResults.global && (
