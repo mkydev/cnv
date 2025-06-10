@@ -1,4 +1,4 @@
-FROM python:3.11
+FROM python:3.10-slim
 
 # Tesseract, Poppler, Curl, ImageMagick ve FFmpeg'i kuruyoruz.
 RUN apt-get update && apt-get install -y --no-install-recommends \
