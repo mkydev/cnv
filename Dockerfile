@@ -1,12 +1,13 @@
 # Python'un slim versiyonunu temel alıyoruz
 FROM python:3.10-slim
 
-# Tesseract, Poppler, Curl ve ImageMagick'i kuruyoruz.
+# ImageMagick'in güvenlik kısıtlamalarını da kaldırıyoruz.
 RUN apt-get update && apt-get install -y \
     tesseract-ocr \
     poppler-utils \
     curl \
     imagemagick \
+    && find /etc/ImageMagick* -name "policy.xml" -exec sed -i 's/<policy domain=.*rights=.*pattern=.*>//g' {} + \
     && rm -rf /var/lib/apt/lists/*
 
 # Proje dosyaları için bir çalışma dizini oluşturuyoruz
