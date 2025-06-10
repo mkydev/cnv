@@ -1,17 +1,18 @@
 # Python'un slim versiyonunu temel alıyoruz
 FROM python:3.10-slim
 
-# apt-get'i tek seferde çalıştırarak hem sistem bağımlılıklarını hem de 'curl' komutunu kuruyoruz.
+# Tesseract, Poppler ve Curl'e ek olarak ImageMagick'i de kuruyoruz.
 RUN apt-get update && apt-get install -y \
     tesseract-ocr \
     poppler-utils \
     curl \
+    imagemagick \
     && rm -rf /var/lib/apt/lists/*
 
 # Proje dosyaları için bir çalışma dizini oluşturuyoruz
 WORKDIR /app
 
-# Önce backend bağımlılıklarını kopyalayıp kuruyoruz ki her kod değişikliğinde tekrar kurulmasın
+# Önce backend bağımlılıklarını kopyalayıp kuruyoruz
 COPY backend/requirements.txt ./backend/requirements.txt
 RUN pip install --no-cache-dir -r backend/requirements.txt
 
