@@ -1,6 +1,17 @@
+# Stage 1: Build frontend
+FROM node:lts as frontend-builder
+
+WORKDIR /app/frontend
+COPY frontend/package.json frontend/package-lock.json ./
+RUN npm ci --silent
+
+COPY frontend .
+RUN npm run build
+
+# Stage 2: Build backend
 FROM python:3.10-slim
 
-# Tesseract, Poppler, Curl, ImageMagick ve FFmpeg'i kuruyoruz.
+# Install system dependencies (OCR, ImageMagick, etc.)
 RUN apt-get update && apt-get install -y --no-install-recommends \
     tesseract-ocr \
     poppler-utils \
@@ -12,19 +23,19 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 WORKDIR /app
 
-COPY backend/requirements.txt ./backend/requirements.txt
-RUN pip install --no-cache-dir -r backend/requirements.txt
+# Copy backend requirements and install
+COPY backend/requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
 
-RUN curl -fsSL https://deb.nodesource.com/setup_lts.x | bash -
-RUN apt-get install -y --no-install-recommends nodejs
+# Copy built frontend from Stage 1
+COPY --from=frontend-builder /app/frontend/dist ./frontend/dist
 
-COPY frontend/package.json frontend/package-lock.json ./frontend/
-RUN cd frontend && npm install
+# Copy backend source code
+COPY backend .
 
-COPY . .
+# Set environment variables
+ENV PORT=10000
+EXPOSE $PORT
 
-RUN cd frontend && npm run build
-
-EXPOSE 10000
-
-CMD gunicorn --workers 4 --bind 0.0.0.0:$PORT --chdir backend app:app
+# Run Gunicorn
+CMD ["gunicorn", "--workers", "4", "--bind", "0.0.0.0:$PORT", "app:app"]
