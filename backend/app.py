@@ -1,4 +1,3 @@
-# backend/app.py - TEŞHİS AMAÇLI GEÇİCİ KOD
 from flask import Flask, request, jsonify, send_from_directory, send_file, after_this_request
 from flask_cors import CORS
 import os
