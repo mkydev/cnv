@@ -12,6 +12,7 @@ const formatOptions = {
       { value: 'pdf', label: 'PDF (From Image)' },
       { value: 'gif', label: 'GIF' },
       { value: 'webp', label: 'WebP' },
+      { value: 'heic', label: 'HEIC' },
     ],
   },
   video: {
@@ -24,7 +25,7 @@ const formatOptions = {
      ],
   },
   ocr: {
-    label: 'Extract Text (OCR)',
+    label: 'İmage to Text (OCR)',
     inputAccept: 'image/*,.pdf',
      output: [
         { value: 'txt', label: 'Text (OCR)' },
@@ -34,7 +35,7 @@ const formatOptions = {
     label: 'PDF Tools',
     inputAccept: '.pdf',
     subOperations: [
-      { id: 'pdf-to-docx', label: 'Convert PDF to Word (DOCX)', targetFormat: 'docx' },
+      { id: 'pdf-to-docx', label: 'Word (DOCX)', targetFormat: 'docx' },
     ],
   },
 };

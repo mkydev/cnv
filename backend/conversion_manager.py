@@ -48,7 +48,7 @@ def handle_conversion_request(input_filepath, file_extension, target_format, UPL
         elif file_extension == 'pdf' and target_format in ['docx']:
             conversion_successful, error_message = convert_pdf_to_docx(input_filepath, output_filepath)
 
-        elif file_extension in ['jpg', 'jpeg', 'png', 'webp', 'gif'] and target_format in ['pdf', 'png', 'jpg', 'webp', 'gif']:
+        elif file_extension in ['jpg', 'jpeg', 'png', 'webp', 'gif','heic'] and target_format in ['pdf', 'png', 'jpg', 'webp', 'gif','heic']:
             # Image Conversions (e.g., ImageMagick)
             conversion_successful, error_message = process_image_conversion(input_filepath, output_filepath)
 
