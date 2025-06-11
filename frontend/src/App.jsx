@@ -25,7 +25,7 @@ const formatOptions = {
      ],
   },
   ocr: {
-    label: 'İmage to Text (OCR)',
+    label: 'Image to Text (OCR)',
     inputAccept: 'image/*,.pdf',
      output: [
         { value: 'txt', label: 'Text (OCR)' },
