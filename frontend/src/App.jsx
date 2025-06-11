@@ -32,7 +32,7 @@ const formatOptions = {
      ],
   },
   pdf: {
-    label: 'PDF Tools',
+    label: 'PDF Converter',
     inputAccept: '.pdf',
     subOperations: [
       { id: 'pdf-to-docx', label: 'Word (DOCX)', targetFormat: 'docx' },
